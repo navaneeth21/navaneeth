@@ -1,0 +1,198 @@
+1. PlacementserviceApplication.java 
+
+package com.tns.Placementservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class PlacementserviceApplication
+{
+	public static void main(String[] args)
+	{
+		SpringApplication.run(PlacementserviceApplication.class, args);
+	}
+}
+
+
+2.Placement.java 
+
+package com.tns.Placementservice;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Placement
+{
+	private Integer p_id;
+	private String p_name;
+ 	private String p_email;
+	
+	
+	public Placement() 
+	{
+		super();
+	}
+	
+	public Placement(Integer p_id, String p_name,String p_email)
+	{
+		super();
+		p_id = p_id;
+		p_name = p_name;
+ 		p_email=p_email;
+	}
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	public Integer getP_id() {
+		return p_id;
+	}
+	public void setP_id(Integer p_id) {
+		P_id = p_id;
+	}
+	public String getP_name() {
+		return p_name;
+	}
+	public void setP_name(String p_name)
+	{
+		p_name = p_name;
+	}
+public String getP_email() {
+		return p_email;
+	}
+	public void setP_email(String p_email)
+	{
+		P_email = p_email;
+	}
+	@Override
+	public String toString()
+	{
+		return "Student[Student id:"+p_id+" Student name"+p_name+"]";
+	}
+}
+
+
+3.Placement_Service_Repository.java 
+
+package com.tns.Placementservice;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface Placement_Service_Repository extends JpaRepository<Student, Integer> 
+{
+
+}
+
+
+4. Placement_Service.java 
+
+package com.tns.Placementservice;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+@Service
+@Transactional
+public class Placement_Service 
+{
+	@Autowired
+	private Placement_Service_Repository repo;
+	
+	public List<Student> listAll()
+	{
+		return repo.findAll();
+	}
+	
+	public void save(Student stud)
+	{
+		repo.save(stud);
+	}
+	
+	public Student get(Integer p_id)
+	{
+		return repo.findById(p_id).get();
+	}
+	public void delete(Integer p_id)
+	{
+		repo.deleteById(p_id);
+	}
+	
+}
+
+
+5. Placement_service_Controller.java 
+
+package com.tns.Placementservice;
+
+import javax.persistence.NoResultException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class Placement_service_Controller
+{
+	@Autowired(required=true)
+	private Placement_Service service;
+	
+	@GetMapping("/Placementservice")
+	public java.util.List<Student> list()
+	{
+		return service.listAll();
+	}
+	
+	@GetMapping("/Placementservice/{s_id}")
+	public ResponseEntity<Placement> get(@PathVariable Integer S_id)
+	{
+		try
+		{
+			Placement stud=service.get(S_id);
+			return new ResponseEntity<Placement>(stud,HttpStatus.OK);
+		}
+		catch(NoResultException e)
+		{
+			return new ResponseEntity<Placement>(HttpStatus.NOT_FOUND);
+		}
+	}
+	@PostMapping("/Placementservice")
+	public void add(@RequestBody Placement stud)
+	{
+		service.save(stud);
+	}
+	
+	@PutMapping("/Placementservice/{s_id}")
+	public ResponseEntity<?> update(@RequestBody Student stud, @PathVariable Integer S_id)
+	{
+		Placement existstud=service.get(S_id);
+		service.save(existstud);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/Placementservice/{s_id}")
+	public void delete(@PathVariable Integer s_id)
+	{
+		service.delete(s_id);
+	}
+}
+
+
+
+
+
+
+
+
+
+
